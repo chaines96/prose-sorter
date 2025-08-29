@@ -61,6 +61,48 @@ try:
 except:
     print("neural_net.pth not found, creating a new neural network.")
 
+#Loss Function
+loss_func = nn.CrossEntropyLoss()
+optimize_func = torch.optim.SGD(model.parameters(), lr=1e-2)
+
+#Training Function
+def train(dataloader, model, loss_fn, optimizer):
+    size = len(dataloader.dataset)
+    model.train()
+    for batch, (X, y) in enumerate(dataloader):
+        X, y = X.to(device), y.to(device)
+
+        #The error in the prediction
+        predicted = model(X)
+        loss = loss_func(predicted, y)
+
+        #Backpropagation
+        loss.backward()
+        optimize_func.step()
+        optimize_func.zero_grad()
+
+        if batch % 5 == 0:
+            loss, current = loss.item(), (batch + 1) * len(X)
+            print(f"Loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+    return
+
+#Testing function
+def test(dataloader, model, loss_fn):
+    size = len(dataloader.dataset)
+    num_batches = len(dataloader)
+    model.eval()
+    test_loss, correct = 0, 0
+    with torch.no_grad():
+        for X, y in dataloader:
+            X, y = X.to(device), y.to(device)
+            predicted = model(X)
+            test_loss += loss_func(predicted, y).item()
+            correct += (predicted.argmax(1) == y).type(torch.float).sum().item()
+    test_loss /= num_batches
+    correct /= size
+    print(f"____TEST ERROR______: \n Total Accuracy: {(100*correct):>0.1f}%, Averge Loss: {test_loss:>8f} \n")
+    return
+
 #This next block uses the tkinter library to create a GUI.
 main_window = Tk(screenName=None, baseName=None, className='Tk', useTk=1)
 main_window.mainloop()
