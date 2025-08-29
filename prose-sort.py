@@ -103,6 +103,31 @@ def test(dataloader, model, loss_fn):
     print(f"____TEST ERROR______: \n Total Accuracy: {(100*correct):>0.1f}%, Averge Loss: {test_loss:>8f} \n")
     return
 
+#Calls the training function for set number of epochs
+epochs = 5
+for i in range(epochs):
+    print(f"Epoch #{i+1}\n________")
+    train(train_dataloader, model, loss_func, optimize_func)
+    test(test_dataloader, model, loss_func)
+print("Completd training. Saving to neural_net.pth.")
+
+torch.save(model.state_dict(), "neural_net.pth")
+print("Saved PyTorch Model State to neural_net.pth.")
+
+classes = ["0", "1", "2"]
+
+model.eval() #Turns our neural network into evaluation mode.
+x, y = test_data[0][0], test_data[0][1]
+print(f"x is {x} and y is {y}")
+with torch.no_grad():
+    x = x.to(device)
+    pred = model(x) #Returns a tensor with predictions.
+    print(pred)
+    result = classes[torch.argmax(pred, dim=0)]
+    print(f'Predicted: "{result}", Actual: "{classes[int(y)]}"')
+
+model.train()  #Turns the neural network into training mode.
+
 #This next block uses the tkinter library to create a GUI.
 main_window = Tk(screenName=None, baseName=None, className='Tk', useTk=1)
 main_window.mainloop()
