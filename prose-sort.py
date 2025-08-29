@@ -34,6 +34,33 @@ test_dataloader = DataLoader(test_data, batch_size=batch_size)
 device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
 
 #This next block uses the tkinter library to create a GUI.
-root = Tk(screenName=None, baseName=None, className='Tk', useTk=1)
-window = m = tkinter.Tk()
-window.mainloop()
+window_root = Tk(screenName=None, baseName=None, className='Tk', useTk=1)
+main_window = m = tkinter.Tk()
+main_window.mainloop()
+
+# Initializing the NeutralNetwork class.
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.flatten = nn.Flatten(start_dim = 0, end_dim = 0)
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(data_len, 64), #Sends each column of the batch number's row to 64 input neurons in a linear layer.
+            nn.ReLU(),
+            nn.Linear(64, 64),
+            nn.ReLU(),
+            nn.Linear(64, 3) #The output neurons here represent labels.
+        )
+
+    def forward(self, x):
+        #x = self.flatten(x) 
+        x = torch.flatten(x, start_dim = 0, end_dim = 0)
+        logits = self.linear_relu_stack(x)
+        return logits
+
+model = NeuralNetwork().to(device)
+
+# This try block tries to load a model to write to it
+try:
+    model.load_state_dict(torch.load("neural_net.pth", weights_only=True))
+except:
+    print("neural_net.pth not found, creating a new neural network.")
