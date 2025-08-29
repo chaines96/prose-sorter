@@ -114,16 +114,15 @@ print("Completd training. Saving to neural_net.pth.")
 torch.save(model.state_dict(), "neural_net.pth")
 print("Saved PyTorch Model State to neural_net.pth.")
 
-classes = ["0", "1", "2"]
+classes = ["0", "1", "2"] #The hard coded results of output.
 
 model.eval() #Turns our neural network into evaluation mode.
 x, y = test_data[0][0], test_data[0][1]
 print(f"x is {x} and y is {y}")
 with torch.no_grad():
     x = x.to(device)
-    pred = model(x) #Returns a tensor with predictions.
-    print(pred)
-    result = classes[torch.argmax(pred, dim=0)]
+    pred = model(x) #Returns a tensor with predictions. Should have as many values as there are classes.
+    result = classes[torch.argmax(pred, dim=0)] #Returns the class corresponding ot the index of the maximum value of the tensor (i.e. what the neural net thinks is most likely).
     print(f'Predicted: "{result}", Actual: "{classes[int(y)]}"')
 
 model.train()  #Turns the neural network into training mode.
