@@ -1,6 +1,7 @@
-import torch, numpy, pandas, sqlite3, tkinter
+import torch, numpy, pandas, sqlite3
 from torch import nn
 from torch.utils.data import Dataset, DataLoader
+from tkinter import * #for the GUI
 
 data_len = len(pandas.read_csv("data.csv").iloc[0]) #The amount of rows in the CSV file, representing the number of entries of the training data.
 batch_size = (data_len // 4) + 1 #The size of the batch of each epoch. Should sacle with the size of the data; I would consider hard coding this to 5.
@@ -33,11 +34,6 @@ test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
 device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
 
-#This next block uses the tkinter library to create a GUI.
-window_root = Tk(screenName=None, baseName=None, className='Tk', useTk=1)
-main_window = m = tkinter.Tk()
-main_window.mainloop()
-
 # Initializing the NeutralNetwork class.
 class NeuralNetwork(nn.Module):
     def __init__(self):
@@ -64,3 +60,7 @@ try:
     model.load_state_dict(torch.load("neural_net.pth", weights_only=True))
 except:
     print("neural_net.pth not found, creating a new neural network.")
+
+#This next block uses the tkinter library to create a GUI.
+main_window = Tk(screenName=None, baseName=None, className='Tk', useTk=1)
+main_window.mainloop()
