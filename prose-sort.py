@@ -40,11 +40,11 @@ class NeuralNetwork(nn.Module):
         super().__init__()
         self.flatten = nn.Flatten(start_dim = 0, end_dim = 0)
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(data_len, 64), #Sends each column of the batch number's row to 64 input neurons in a linear layer.
+            nn.Linear(data_len, 128), #Sends each column of the batch number's row to 64 input neurons in a linear layer.
             nn.ReLU(),
-            nn.Linear(64, 64),
+            nn.Linear(128, 128),
             nn.ReLU(),
-            nn.Linear(64, 3) #The output neurons here represent labels.
+            nn.Linear(128, 6) #The output neurons here represent labels.
         )
 
     def forward(self, x):
@@ -114,7 +114,7 @@ print("Completd training. Saving to neural_net.pth.")
 torch.save(model.state_dict(), "neural_net.pth")
 print("Saved PyTorch Model State to neural_net.pth.")
 
-classes = ["0", "1", "2"] #The hard coded results of output.
+classes = ["Happy", "Sad", "Angry", "Informative", "Nonsense", "Funny"] #The hard coded results of output.
 
 model.eval() #Turns our neural network into evaluation mode.
 x, y = test_data[0][0], test_data[0][1]
