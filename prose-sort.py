@@ -1,4 +1,4 @@
-import torch, numpy, pandas, sqlite3
+import torch, numpy, pandas
 from torch import nn
 from torch.utils.data import Dataset, DataLoader
 from tkinter import * #for the GUI
@@ -116,17 +116,20 @@ print("Saved PyTorch Model State to neural_net.pth.")
 
 classes = ["Happy", "Sad", "Angry", "Informative", "Nonsense", "Funny"] #The hard coded results of output.
 
+#This next block uses the tkinter library to create a GUI.
+main_window = Tk(screenName=None, baseName=None, className='Tk', useTk=1)
+
 model.eval() #Turns our neural network into evaluation mode.
 x, y = test_data[0][0], test_data[0][1]
-print(f"x is {x} and y is {y}")
 with torch.no_grad():
     x = x.to(device)
     pred = model(x) #Returns a tensor with predictions. Should have as many values as there are classes.
     result = classes[torch.argmax(pred, dim=0)] #Returns the class corresponding ot the index of the maximum value of the tensor (i.e. what the neural net thinks is most likely).
-    print(f'Predicted: "{result}", Actual: "{classes[int(y)]}"')
+    out_text = f'Predicted: "{result}", Actual: "{classes[int(y)]}"'
 
 model.train()  #Turns the neural network into training mode.
 
-#This next block uses the tkinter library to create a GUI.
-main_window = Tk(screenName=None, baseName=None, className='Tk', useTk=1)
+#Creates a widget in the main_window tkinter instance.
+result_widget = Label(main_window, text = out_text)
+result_widget.pack()
 main_window.mainloop()
