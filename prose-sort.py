@@ -3,6 +3,8 @@ from torch import nn
 from torch.utils.data import Dataset, DataLoader
 from tkinter import * #for the GUI
 
+#Setting some variables
+EPOCHS = 100 #Amount of times to iterate over the training data.
 data_len = len(pandas.read_csv("data.csv").iloc[0]) #The amount of rows in the CSV file, representing the number of entries of the training data.
 batch_size = (data_len // 4) + 1 #The size of the batch of each epoch. Should sacle with the size of the data; I would consider hard coding this to 5.
 
@@ -104,8 +106,7 @@ def test(dataloader, model, loss_fn):
     return
 
 #Calls the training function for set number of epochs
-epochs = 5
-for i in range(epochs):
+for i in range(EPOCHS):
     print(f"Epoch #{i+1}\n________")
     train(train_dataloader, model, loss_func, optimize_func)
     test(test_dataloader, model, loss_func)
@@ -114,22 +115,24 @@ print("Completd training. Saving to neural_net.pth.")
 torch.save(model.state_dict(), "neural_net.pth")
 print("Saved PyTorch Model State to neural_net.pth.")
 
-classes = ["Happy", "Sad", "Angry", "Informative", "Nonsense", "Funny"] #The hard coded results of output.
+categories = ["Happy", "Sad", "Angry", "Informative", "Nonsense", "Funny"] #The hard coded results of output.
 
 #This next block uses the tkinter library to create a GUI.
-main_window = Tk(screenName=None, baseName=None, className='Tk', useTk=1)
+main_window = Tk(screenName=None, baseName=None, className=' Result', useTk=1)
+main_window.geometry("500x60") #Sets the result output window's size.
+main_window.resizable(True, True)
 
 model.eval() #Turns our neural network into evaluation mode.
 x, y = test_data[0][0], test_data[0][1]
 with torch.no_grad():
     x = x.to(device)
     pred = model(x) #Returns a tensor with predictions. Should have as many values as there are classes.
-    result = classes[torch.argmax(pred, dim=0)] #Returns the class corresponding ot the index of the maximum value of the tensor (i.e. what the neural net thinks is most likely).
-    out_text = f'Predicted: "{result}", Actual: "{classes[int(y)]}"'
+    result = categories[torch.argmax(pred, dim=0)] #Returns the class corresponding ot the index of the maximum value of the tensor (i.e. what the neural net thinks is most likely).
+    out_text = f'Predicted: "{result}", Actual: "{categories[int(y)]}"'
 
 model.train()  #Turns the neural network into training mode.
 
 #Creates a widget in the main_window tkinter instance.
-result_widget = Label(main_window, text = out_text)
+result_widget = Label(main_window, text = out_text,font="Arial 16")
 result_widget.pack()
 main_window.mainloop()
