@@ -11,8 +11,12 @@ batch_size = (data_len // 4) + 1 #The size of the batch of each epoch. Should sa
 class ProseDataset(Dataset):
     def __init__(self, file_path, label_path, transform=None,target_transform=None):
         pandas.options.display.max_rows = 100 #Panda's default is 60
-        self.data = pandas.read_csv(file_path)
-        self.labels = pandas.read_csv(label_path)
+        try:
+            self.data = pandas.read_csv(file_path)
+            self.labels = pandas.read_csv(label_path)
+        except:
+            print("Cannot read or write to " + file_path)
+            exit()
 
     def __len__(self):
         return len(self.data)
@@ -57,7 +61,7 @@ class NeuralNetwork(nn.Module):
 
 model = NeuralNetwork().to(device)
 
-# This try block tries to load a model to write to it
+# This try block will load load a model to write to it
 try:
     model.load_state_dict(torch.load("neural_net.pth", weights_only=True))
 except:
@@ -119,7 +123,7 @@ categories = ["Happy", "Sad", "Angry", "Informative", "Nonsense", "Funny"] #The 
 
 #This next block uses the tkinter library to create a GUI.
 main_window = Tk(screenName=None, baseName=None, className=' Result', useTk=1)
-main_window.geometry("500x60") #Sets the result output window's size.
+main_window.geometry("500x200") #Sets the result output window's size.
 main_window.resizable(True, True)
 
 model.eval() #Turns our neural network into evaluation mode.
@@ -132,7 +136,21 @@ with torch.no_grad():
 
 model.train()  #Turns the neural network into training mode.
 
+def enter_data():
+    print(new_sentence)
+    return
+
+enter_button = Button(main_window,text="Progress",command=enter_data,activebackground="blue", activeforeground="white",anchor="center",bd=3,bg="lightgray",cursor="hand2",
+                      disabledforeground="gray",fg="black",font=("Arial", 12),height=2,highlightbackground="black",highlightcolor="green",highlightthickness=2,justify="center",
+                      overrelief="raised",padx=10,pady=5,width=15,wraplength=100)
+new_sentence_var = StringVar()
+new_sentence_var.set("")
+text_entry = Entry(main_window, textvariable=new_sentence_var,font=('Arial',16))
+new_sentence = new_sentence_var.get()
+
 #Creates a widget in the main_window tkinter instance.
 result_widget = Label(main_window, text = out_text,font="Arial 16")
+enter_button.pack(padx=20, pady=20)
+text_entry.pack(padx=40, pady=20)
 result_widget.pack()
 main_window.mainloop()
