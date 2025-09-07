@@ -5,8 +5,6 @@ from tkinter import * #for the GUI
 
 #Setting some variables
 EPOCHS = 100 #Amount of times to iterate over the training data.
-data_len = len(pandas.read_csv("data.csv").iloc[0]) #The amount of rows in the CSV file, representing the number of entries of the training data.
-batch_size = (data_len // 4) + 1 #The size of the batch of each epoch. Should sacle with the size of the data; I would consider hard coding this to 5.
 
 class ProseDataset(Dataset):
     def __init__(self, file_path, label_path, transform=None,target_transform=None):
@@ -15,7 +13,7 @@ class ProseDataset(Dataset):
             self.data = pandas.read_csv(file_path)
             self.labels = pandas.read_csv(label_path)
         except:
-            print("Cannot read or write to " + file_path)
+            print("Cannot read or write to %s",file_path)
             exit()
 
     def __len__(self):
@@ -39,6 +37,10 @@ train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
 device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
+
+#Two variables that must be defined after we verify that data.csv and test.csv are loaded.
+data_len = len(pandas.read_csv("data.csv").iloc[0]) #The amount of rows in the CSV file, representing the number of entries of the training data.
+batch_size = (data_len // 4) + 1 #The size of the batch of each epoch. Should sacle with the size of the data; I would consider hard coding this to 5.
 
 # Initializing the NeutralNetwork class.
 class NeuralNetwork(nn.Module):
